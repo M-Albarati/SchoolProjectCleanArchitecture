@@ -1,0 +1,77 @@
+using Microsoft.AspNetCore.Connections;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
+using SchoolProject.Core;
+using SchoolProject.Core.Middleware;
+using SchoolProject.Infrustructure;
+using SchoolProject.Infrustructure.Abstracts;
+using SchoolProject.Infrustructure.Data;
+using SchoolProject.Infrustructure.Repositaries;
+using SchoolProject.Service;
+
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+#region Connection To Sql Server
+builder.Services.AddDbContext<AppDbContext>(option =>
+{
+    option.UseSqlServer(builder.Configuration.GetConnectionString("dbcontext"));
+});
+#endregion
+
+#region Dependency Injection
+//builder.Services.AddTransient<IStudentRepositary, StudentRepositary>();
+builder.Services.AddInfrustructureDependencies()
+                .AddServiceDependencies()
+                .AddCoreDependencies();
+#endregion
+
+#region AllowCORS "Cross Origin" 
+var CORS = "_cors";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: CORS,
+                      policy =>
+                      {
+                          policy.AllowAnyHeader();
+                          policy.AllowAnyMethod();
+                          /* 
+                           // Allow Specific Origion
+                           policy.WithOrigins("https://MyServer1IP", "https://MyServer2IP");
+                          */
+                          // Allow Any Origion
+                          policy.AllowAnyOrigin();
+                      });
+
+});
+#endregion
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+
+app.UseMiddleware<ErrorHandlerMiddleware>();
+
+app.UseHttpsRedirection();
+
+//AllowCORS "Cross Origin"
+app.UseCors(CORS);
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
