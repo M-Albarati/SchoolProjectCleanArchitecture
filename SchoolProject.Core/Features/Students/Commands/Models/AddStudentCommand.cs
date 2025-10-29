@@ -20,11 +20,11 @@ namespace SchoolProject.Core.Features.Students.Commands.Models
         //}
 
         //[Required]
-        public string? Name { get; set; }
+        public string Name { get; set; }
         //[Required]
-        public string? Address { get; set; }
-        public string? Phone { get; set; }
-        public int? DeparmentId { get; set; }
+        public string Address { get; set; }
+        public string Phone { get; set; }
+        public int DeparmentId { get; set; }
 
     }
 }

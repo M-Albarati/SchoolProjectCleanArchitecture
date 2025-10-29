@@ -37,9 +37,8 @@ namespace SchoolProject.Service.Implementations
 
         public async Task<bool> IsIdExist(int id)
         {
-            var dep = _departmentRepositry.GetByIdAsync(id);                                   
-            if(dep == null) return false;
-            return true;
+            return await _departmentRepositry.GetTableNoTracking().AnyAsync(x=> x.DID.Equals(id));                                   
+           
         }
         #endregion
 

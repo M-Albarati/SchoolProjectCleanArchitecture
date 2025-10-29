@@ -100,14 +100,17 @@ namespace SchoolProject.Service.Implementations
 
         public async Task<string> DeleteAsync(Student student)
         {
+            var Trans = _studentRepositary.BeginTransaction();
             try
             {
                 await _studentRepositary.DeleteAsync(student);
+                await Trans.CommitAsync();
                 return "Success";
             }
             catch (Exception e)
             {
                 var s = e.Message;
+                await Trans.RollbackAsync();
                 return "Exception";
             }
         }

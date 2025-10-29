@@ -15,13 +15,15 @@ namespace SchoolProject.Core.Features.Students.Commands.Validations
         
         #region Fields
         private readonly IStudentService _studentService;
+        private readonly IDepartmentService _departmentService;
         
         #endregion
 
         #region Constractor
-        public AddStudentValidator(IStudentService studentService)
+        public AddStudentValidator(IStudentService studentService, IDepartmentService departmentService)
         {
-            _studentService = studentService; 
+            _studentService = studentService;
+            _departmentService = departmentService;
 
             ApplyValidationRoles();
             ApplyCustomValidationRoles();
@@ -41,12 +43,19 @@ namespace SchoolProject.Core.Features.Students.Commands.Validations
                 .NotNull().WithMessage("{PropertyName} Must Be Not Null")
                 .NotEmpty().WithMessage("{PropertyName} Must Be Not Empty")
                 .MaximumLength(50).WithMessage("{PropertyName} Max Length is 50");
+
+            RuleFor(x => x.DeparmentId)
+                .NotNull().WithMessage("{PropertyName} Must Be Not Null")
+                .NotEmpty().WithMessage("{PropertyName} Must Be Not Empty");
         }
 
         public void ApplyCustomValidationRoles()
         {
             RuleFor(x => x.Name).MustAsync(async (key, CancellationToken) => !await _studentService.IsNameExist(key))
                 .WithMessage(" This Name Is Exist");
+            
+            RuleFor(x => x.DeparmentId).MustAsync(async (key, CancellationToken) => await _departmentService.IsIdExist(key))
+                .WithMessage(" Department Id Is Not Exist");
         }
         #endregion
 
