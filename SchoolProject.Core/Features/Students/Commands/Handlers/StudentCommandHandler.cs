@@ -93,7 +93,8 @@ namespace SchoolProject.Core.Features.Students.Commands.Handlers
             // check Success
             if (reslt == "Success") { return Deleted<string>(); }
             // check Bad Request
-            else { return BadRequest<string>(); }
+            else { return BadRequest<string>(); } 
+
         }
         #endregion
 
