@@ -69,10 +69,17 @@ namespace SchoolProject.Core.Features.Students.Queries.Handlers
             //var PaginatedList = await queryable.Select(expression).ToPaginatedListAsync(request.PageNumber,request.PageSize);
 
             // Pagination with query
-            var queryable = _studentService.FilterStudentsPaginatedQueryable(request.Search, request.OrderBy);
-            var PaginatedList = await queryable.Select(x=> new GetStudentPaginatedListResponse(x.StudID,x.Name,x.Address,x.Department.DName) ).ToPaginatedListAsync(request.PageNumber,request.PageSize);
+            //var queryable = _studentService.FilterStudentsPaginatedQueryable(request.Search, request.OrderBy);
+            //var PaginatedList = await queryable.Select(x=> new GetStudentPaginatedListResponse(x.StudID,x.Name,x.Address,x.Department.DName) ).ToPaginatedListAsync(request.PageNumber,request.PageSize);
 
+            // Pagination with Mapping
+            var queryable = _studentService.FilterStudentsPaginatedQueryable(request.Search, request.OrderBy);
+            var PaginatedList = await _mapper.ProjectTo<GetStudentPaginatedListResponse>(queryable).ToPaginatedListAsync(request.PageNumber, request.PageSize);
+
+            //additinal data
+            PaginatedList.Meta = new { count = PaginatedList.Data.Count() };
             return PaginatedList;
+
         }
 
 
