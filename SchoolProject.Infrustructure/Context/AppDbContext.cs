@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SchoolProject.Data.Entities;
+using SchoolProject.Data.Entities.Identity;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -9,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace SchoolProject.Infrustructure.Data
 {
-    public class AppDbContext :DbContext
+    public class AppDbContext :IdentityDbContext<User, IdentityRole<int>, int, IdentityUserClaim<int>, IdentityUserRole<int>, IdentityUserLogin<int>, IdentityRoleClaim<int>, IdentityUserToken<int>>
     {
         public AppDbContext()
         {
@@ -26,6 +29,8 @@ namespace SchoolProject.Infrustructure.Data
         public DbSet<StudentSubject> StudentSubjects { get; set; }
         public DbSet<DepartmetSubject> DepartmetSubjects { get; set;}
 
+        // Identity
+        public DbSet<User> users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

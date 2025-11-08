@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SchoolProject.Data.Entities
 {
-    public partial class Department
+    public class Department
     {
         public Department()
         {
