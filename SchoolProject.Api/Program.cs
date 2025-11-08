@@ -30,7 +30,8 @@ builder.Services.AddDbContext<AppDbContext>(option =>
 //builder.Services.AddTransient<IStudentRepositary, StudentRepositary>();
 builder.Services.AddInfrustructureDependencies()
                 .AddServiceDependencies()
-                .AddCoreDependencies();
+                .AddCoreDependencies()
+                .AddServiceRegisteration();
 #endregion
 
 #region AllowCORS "Cross Origin" 

@@ -30,7 +30,7 @@ namespace SchoolProject.Infrustructure.Data
         public DbSet<DepartmetSubject> DepartmetSubjects { get; set;}
 
         // Identity
-        public DbSet<User> users { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
