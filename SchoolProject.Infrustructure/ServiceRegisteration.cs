@@ -22,9 +22,9 @@ namespace SchoolProject.Infrustructure
                 // Password settings.
                 option.Password.RequireDigit = true;
                 option.Password.RequireLowercase = true;
-                option.Password.RequireNonAlphanumeric = true;
+                option.Password.RequireNonAlphanumeric = false;
                 option.Password.RequireUppercase = true;
-                option.Password.RequiredLength = 6;
+                option.Password.RequiredLength = 8;
                 option.Password.RequiredUniqueChars = 1;
 
                 // Lockout settings.
@@ -36,7 +36,7 @@ namespace SchoolProject.Infrustructure
                 option.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 option.User.RequireUniqueEmail = true;
-                option.SignIn.RequireConfirmedEmail = true;
+                option.SignIn.RequireConfirmedEmail = false;
 
             }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
