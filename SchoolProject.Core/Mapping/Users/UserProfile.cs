@@ -12,6 +12,8 @@ namespace SchoolProject.Core.Mapping.Users
         public UserProfile()
         {
             AddUserMapping();
+            GetUserPaginatedListMapping();
+            GetUserByIdMapping();
         }
     }
 }
