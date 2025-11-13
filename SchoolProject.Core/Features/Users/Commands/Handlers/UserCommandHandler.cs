@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SchoolProject.Core.Bases;
 using SchoolProject.Core.Features.Users.Commands.Models;
 using SchoolProject.Data.Entities.Identity;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 namespace SchoolProject.Core.Features.Users.Commands.Handlers
 {
     internal class UserCommandHandler : ResponseHandler, IRequestHandler<AddUserCommand, Response<string>>
+                                                       , IRequestHandler<EditUserCommand, Response<string>>
     {
         #region Fields
         private readonly UserManager<User> _usermanager;
@@ -53,6 +55,28 @@ namespace SchoolProject.Core.Features.Users.Commands.Handlers
             }
             //Sucess
                 return Created("Created"); 
+        }
+
+        public async Task<Response<string>> Handle(EditUserCommand request, CancellationToken cancellationToken)
+        {
+            //var OldUser = _usermanager.FindByIdAsync(request.Id.ToString());
+            var OldUser = await _usermanager.Users.FirstOrDefaultAsync(x=> x.Id  == request.Id);
+            // User Not Exist => NotFound
+            if (OldUser == null)
+            {
+                return NotFound<string>("User ID Not Exist");
+            }
+            // Update User
+            var UserMapper = _mapper.Map(request,OldUser);
+            
+            var result = await _usermanager.UpdateAsync(UserMapper);
+            //Faild
+            if (!result.Succeeded)
+            {
+
+                return BadRequest<string>(result.ToString());
+            }
+            return Updated("");
         }
         #endregion
 

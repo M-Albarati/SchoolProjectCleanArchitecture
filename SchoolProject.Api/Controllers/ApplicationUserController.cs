@@ -40,6 +40,14 @@ namespace SchoolProject.Api.Controllers
             return NewResult(response);
         }
 
+        [HttpPut(Router.UserRoute.Update)]
+        public async Task<IActionResult> Update([FromBody] EditUserCommand Command)
+        {
+            //var response = await _mediator.Send(Command);
+            var response = await Mediator.Send(Command);
+            return NewResult(response);
+        }
+
         [HttpGet(Router.UserRoute.Paginated)]
         public async Task<IActionResult> GetUserPaginated([FromQuery] GetUserPaginatedListQuery query)
         {
