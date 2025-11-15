@@ -15,6 +15,8 @@ namespace SchoolProject.Core.Features.Users.Commands.Handlers
 {
     internal class UserCommandHandler : ResponseHandler, IRequestHandler<AddUserCommand, Response<string>>
                                                        , IRequestHandler<EditUserCommand, Response<string>>
+                                                       , IRequestHandler<DeleteUserCommand, Response<string>>
+                                                       , IRequestHandler<ChangeUserPasswordCommand, Response<string>>
     {
         #region Fields
         private readonly UserManager<User> _usermanager;
@@ -66,6 +68,14 @@ namespace SchoolProject.Core.Features.Users.Commands.Handlers
             {
                 return NotFound<string>("User ID Not Exist");
             }
+            // check UserName is Exist for anather User
+            var userByUserName = await _usermanager.Users.FirstOrDefaultAsync(x => x.UserName == request.UserName
+                                                                               && x.Id != request.Id );
+            if (userByUserName != null)
+            {
+                return BadRequest<string>("UserName Is Exist");
+            }
+
             // Update User
             var UserMapper = _mapper.Map(request,OldUser);
             
@@ -78,6 +88,56 @@ namespace SchoolProject.Core.Features.Users.Commands.Handlers
             }
             return Updated("");
         }
+
+        public async Task<Response<string>> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
+        {
+            //var OldUser = _usermanager.FindByIdAsync(request.Id.ToString());
+            var user = await _usermanager.Users.FirstOrDefaultAsync(x => x.Id == request.Id);
+            // User Not Exist => NotFound
+            if (user == null)
+            {
+                return NotFound<string>("User ID Not Exist");
+            }
+            
+            var result = await _usermanager.DeleteAsync(user);
+            //Faild
+            if (!result.Succeeded)
+            {
+
+                return BadRequest<string>(result.ToString());
+            }
+            return Deleted<string>();
+        }
+
+        public async Task<Response<string>> Handle(ChangeUserPasswordCommand request, CancellationToken cancellationToken)
+        {
+            //var OldUser = _usermanager.FindByIdAsync(request.Id.ToString());
+            var user = await _usermanager.Users.FirstOrDefaultAsync(x => x.Id == request.Id);
+            // User Not Exist => NotFound
+            if (user == null)
+            {
+                return NotFound<string>("User ID Not Exist");
+            }
+            // check UserName is Exist for anather User
+            var userByUserName = await _usermanager.Users.FirstOrDefaultAsync(x => (x.UserName == request.UserName)
+                                                                               && (x.Id != request.Id) );
+            if (userByUserName != null)
+            {
+                return BadRequest<string>("UserName Mismatch");
+            }
+
+            // Update User Password
+            var result = await _usermanager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+            //Faild
+            if (!result.Succeeded)
+            {
+
+                return BadRequest<string>(result.ToString());
+            }
+            return Updated("Password Changed");
+        }
+
+
         #endregion
 
     }

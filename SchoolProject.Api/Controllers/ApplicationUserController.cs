@@ -48,6 +48,23 @@ namespace SchoolProject.Api.Controllers
             return NewResult(response);
         }
 
+        [HttpDelete(Router.UserRoute.Delete)]
+        public async Task<IActionResult> DeleteUserById(int id/*[FromRoute]int id*/)
+        {
+            //var response = await _mediator.Send(new DeleteUserCommand(id));
+            var response = await Mediator.Send(new DeleteUserCommand(id));
+            return NewResult(response);
+
+        }
+
+        [HttpPut(Router.UserRoute.ChangePassword)]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangeUserPasswordCommand Command)
+        {
+            //var response = await _mediator.Send(Command);
+            var response = await Mediator.Send(Command);
+            return NewResult(response);
+        }
+
         [HttpGet(Router.UserRoute.Paginated)]
         public async Task<IActionResult> GetUserPaginated([FromQuery] GetUserPaginatedListQuery query)
         {
@@ -64,7 +81,7 @@ namespace SchoolProject.Api.Controllers
             var response = await Mediator.Send(new GetUserByIdQuery(id));
             return NewResult(response);
 
-        }
+        } 
         #endregion
     }
 }
