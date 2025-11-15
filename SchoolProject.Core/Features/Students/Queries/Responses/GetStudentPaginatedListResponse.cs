@@ -8,13 +8,14 @@ namespace SchoolProject.Core.Features.Students.Queries.Responses
 {
     public class GetStudentPaginatedListResponse
     {
-        public GetStudentPaginatedListResponse(int studID, string? name, string? address, string? deparmentName)
-        {
-            StudID = studID;
-            Name = name;
-            Address = address;
-            DeparmentName = deparmentName;
-        }
+        //// not required when Pagination with Mapping
+        //public GetStudentPaginatedListResponse(int studID, string? name, string? address, string? deparmentName)
+        //{
+        //    StudID = studID;
+        //    Name = name;
+        //    Address = address;
+        //    DeparmentName = deparmentName;
+        //}
 
         public int StudID { get; set; }
         public string? Name { get; set; }

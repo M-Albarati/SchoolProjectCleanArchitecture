@@ -6,7 +6,7 @@ using System.Net;
 namespace SchoolProject.Api.Base
 {
     [ApiController]
-    public class AppObjectResult: ControllerBase //handle ReturnCode = StatusCode
+    public class AppControllerBase: ControllerBase //handle ReturnCode = StatusCode
     {
         #region Fields And  Create NewMediatorInstance
         private IMediator _mediatorInstance;

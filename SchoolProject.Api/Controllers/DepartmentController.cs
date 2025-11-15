@@ -9,7 +9,7 @@ namespace SchoolProject.Api.Controllers
 {
     //[Route("api/[controller]")]
     [ApiController]
-    public class DepartmentController : AppObjectResult //{ControllerBase}  handle ObjectResult ReturnCode = StatusCode
+    public class DepartmentController : AppControllerBase //{ControllerBase}  handle ObjectResult ReturnCode = StatusCode
     {
         #region Fields
         //private readonly IMediator _mediator;
@@ -25,7 +25,7 @@ namespace SchoolProject.Api.Controllers
                     // تم استبدال
                     // ( _mediator => Mediator)
                     // الذي في الكلاس
-                    // (AppObjectResult)
+                    // (AppControllerBase)
 
         #region Handel Function
 

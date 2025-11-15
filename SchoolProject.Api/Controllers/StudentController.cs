@@ -13,7 +13,7 @@ namespace SchoolProject.Api.Controllers
 {
     //[Route("api/[controller]")]
     [ApiController]
-    public class StudentController : AppObjectResult //{ControllerBase}  handle ObjectResult ReturnCode = StatusCode
+    public class StudentController : AppControllerBase //{ControllerBase}  handle ObjectResult ReturnCode = StatusCode
     {
         #region Fields
         //private readonly IMediator _mediator;
@@ -28,7 +28,7 @@ namespace SchoolProject.Api.Controllers
                         // تم استبدال
                         // ( _mediator => Mediator)
                         // الذي في الكلاس
-                        // (AppObjectResult)
+                        // (AppControllerBase)
 
         #region Handel Function
         [HttpGet(Router.StudentRoute.List)]
@@ -64,7 +64,7 @@ namespace SchoolProject.Api.Controllers
            return NewResult(response);
 
         }
-        [HttpPost(Router.StudentRoute.Update)]
+        [HttpPut(Router.StudentRoute.Update)]
         public async Task<IActionResult> Update([FromBody] EditStudentCommand Command)
         {
             //var response = await _mediator.Send(Command);
