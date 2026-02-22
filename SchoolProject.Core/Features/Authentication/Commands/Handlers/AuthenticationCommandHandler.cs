@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SchoolProject.Core.Bases;
 using SchoolProject.Core.Features.Authentication.Commands.Models;
 using SchoolProject.Data.Entities.Identity;
+using SchoolProject.Data.Helpers;
 using SchoolProject.Service.Abstracts;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,8 @@ using System.Threading.Tasks;
 namespace SchoolProject.Core.Features.Authentication.Commands.Handlers
 {
     public class AuthenticationCommandHandler:ResponseHandler,
-                                              IRequestHandler<SignInCommand,Response<string>>
+                                              IRequestHandler<SignInCommand,Response<JwtAuthResult>>,
+                                              IRequestHandler<RefreshTokenCommand,Response<JwtAuthResult>>
     {
 
         #region Fields
@@ -36,14 +38,14 @@ namespace SchoolProject.Core.Features.Authentication.Commands.Handlers
         #endregion
 
         #region Handle Functions
-        public async Task<Response<string>> Handle(SignInCommand request, CancellationToken cancellationToken)
+        public async Task<Response<JwtAuthResult>> Handle(SignInCommand request, CancellationToken cancellationToken)
         {
             // Ckeck UserName Is Exist
             var user = await _usermanager.FindByNameAsync(request.UserName);
             // User Not Exist =>  User Not Found
             if (user == null)
             {
-                return NotFound<string>("User ID Not Exist");
+                return NotFound<JwtAuthResult>("User ID Not Exist");
             }
 
             // Try Login And Ckeck Password Is Correct
@@ -52,12 +54,18 @@ namespace SchoolProject.Core.Features.Authentication.Commands.Handlers
             if (!SignInResult.Result.Succeeded)
             {
                 //return BadRequest<string>(SignInResult.Status.ToString());
-                return BadRequest<string>("Password Is Wrong");
+                return BadRequest<JwtAuthResult>("Password Is Wrong");
             }
             //Generate JWT Token
-            var AccessToken = await _authenticationService.GetJWTToken(user);
+            var Result = await _authenticationService.GetJWTToken(user);
             //Return Token
-            return Success("AccessToken:"+AccessToken);
+            return Success(Result);
+        }
+
+        public async Task<Response<JwtAuthResult>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+        {
+            var result = await _authenticationService.GetRefreshToken(request.AccessToken, request.RefreshToken);
+            return Success(result);
         }
         #endregion
     }
