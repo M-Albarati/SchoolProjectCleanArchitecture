@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Connections;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using Microsoft.Extensions.Configuration;
 using SchoolProject.Core;
 using SchoolProject.Core.Middleware;
 using SchoolProject.Infrustructure;
@@ -31,7 +32,7 @@ builder.Services.AddDbContext<AppDbContext>(option =>
 builder.Services.AddInfrustructureDependencies()
                 .AddServiceDependencies()
                 .AddCoreDependencies()
-                .AddServiceRegisteration();
+                .AddServiceRegisteration(builder.Configuration);
 #endregion
 
 #region AllowCORS "Cross Origin" 
@@ -70,6 +71,9 @@ app.UseHttpsRedirection();
 
 //AllowCORS "Cross Origin"
 app.UseCors(CORS);
+
+// Add Authentication
+app.UseAuthentication();
 
 app.UseAuthorization();
 

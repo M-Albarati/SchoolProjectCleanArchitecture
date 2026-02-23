@@ -33,7 +33,8 @@ namespace SchoolProject.Data.AppMetaData
             public const string Create = Prefix + "/" + "Create";
             public const string Update = Prefix + "/" + "Update";
             public const string Delete = Prefix + "/" + "Delete";
-        }public static class UserRoute
+        }
+        public static class UserRoute
         {
             private const string Prefix = Rule + "/" + "User";
             public const string List = Prefix + "/" + "List";
@@ -44,6 +45,13 @@ namespace SchoolProject.Data.AppMetaData
             public const string Update = Prefix + "/" + "Update";
             public const string Delete = Prefix + "/" + "Delete";
             public const string ChangePassword = Prefix + "/" + "ChangePassword";
+        }
+        public static class AuthRoute
+        {
+            private const string Prefix = Rule + "/" + "Auth";
+            public const string SignIn = Prefix + "/" + "SignIn";
+            public const string RefreshToken = Prefix + "/" + "RefreshToken";
+            public const string ValidateToken = Prefix + "/" + "ValidateToken";
         }
     }
 }

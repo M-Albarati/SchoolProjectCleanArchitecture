@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolProject.Api.Base;
 using SchoolProject.Core.Features.Departments.Queries.Models;
@@ -66,6 +67,7 @@ namespace SchoolProject.Api.Controllers
         }
 
         [HttpGet(Router.UserRoute.Paginated)]
+        [AllowAnonymous]
         public async Task<IActionResult> GetUserPaginated([FromQuery] GetUserPaginatedListQuery query)
         {
             //var response = await _mediator.Send(query);
@@ -75,6 +77,7 @@ namespace SchoolProject.Api.Controllers
         }
 
         [HttpGet(Router.UserRoute.GetById)]
+        [Authorize]
         public async Task<IActionResult> GetUserById(int id/*[FromRoute]int id*/)
         {
             //var response = await _mediator.Send(new GetUserByIdQuery(id));
