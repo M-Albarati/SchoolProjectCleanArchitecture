@@ -56,7 +56,7 @@ namespace SchoolProject.Data.AppMetaData
         public static class AuthorizationRoute
         {
             private const string Prefix = Rule + "/" + "Authorization";
-            public const string Create = Prefix + "/" + "Create";
+            public const string Create = Prefix + "/" + "Role/Create";
         }
     }
 }

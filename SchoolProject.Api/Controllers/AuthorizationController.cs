@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolProject.Api.Base;
 using SchoolProject.Core.Features.Authentication.Commands.Models;
@@ -10,6 +11,7 @@ namespace SchoolProject.Api.Controllers
 {
     //[Route("api/[controller]")]
     [ApiController]
+    [Authorize (Roles = "Admin")]
     public class AuthorizationController : AppControllerBase //{ControllerBase}  handle ObjectResult ReturnCode = StatusCode
     {
         #region Fields

@@ -49,6 +49,8 @@ namespace SchoolProject.Core.Features.Users.Commands.Handlers
             // Create User With Password
             var usermapper = _mapper.Map<User>(request);
             var result =await _usermanager.CreateAsync(usermapper, request.Password);
+            // Add new user to User Role
+            await _usermanager.AddToRoleAsync(usermapper, "User");
             //Faild
             if (!result.Succeeded)
             {

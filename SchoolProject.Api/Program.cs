@@ -1,13 +1,16 @@
 using Microsoft.AspNetCore.Connections;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.Configuration;
 using SchoolProject.Core;
 using SchoolProject.Core.Middleware;
+using SchoolProject.Data.Entities.Identity;
 using SchoolProject.Infrustructure;
 using SchoolProject.Infrustructure.Abstracts;
 using SchoolProject.Infrustructure.Data;
 using SchoolProject.Infrustructure.Repositaries;
+using SchoolProject.Infrustructure.Seeder;
 using SchoolProject.Service;
 
 
@@ -56,6 +59,16 @@ builder.Services.AddCors(options =>
 #endregion
 
 var app = builder.Build();
+
+// Seed Initial Roles And Admin User
+using (var scope = app.Services.CreateScope())
+{
+    var _roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+    var _userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+
+    await RoleSeeder.SeedAsync(_roleManager);
+    await UserSeeder.SeedAsync(_userManager);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
