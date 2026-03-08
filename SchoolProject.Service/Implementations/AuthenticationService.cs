@@ -84,7 +84,7 @@ namespace SchoolProject.Service.Implementations
                 audience: _jwtSettings.Audience,
                 claims:Claims,
                 expires: DateTime.Now.AddDays(_jwtSettings.AccessTokenExpireDate),
-                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.Secret)), SecurityAlgorithms.HmacSha256Signature) //HmacSha256Signature
+                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.Secret)), SecurityAlgorithms.HmacSha256) //HmacSha256Signature
                                                 );
             var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
             return (jwtToken, accessToken);
@@ -130,7 +130,7 @@ namespace SchoolProject.Service.Implementations
             var jwtSecurityToken = ReadJWTToken(accessToken);
 
             // Validation
-            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature)) ////HmacSha256Signature
+            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256)) ////HmacSha256Signature
             {
                 throw new SecurityTokenException("Algorithm Is Wrong",null);
             }
