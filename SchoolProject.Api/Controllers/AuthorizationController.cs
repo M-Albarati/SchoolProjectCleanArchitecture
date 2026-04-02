@@ -11,7 +11,8 @@ namespace SchoolProject.Api.Controllers
 {
     //[Route("api/[controller]")]
     [ApiController]
-    [Authorize (Roles = "Admin")]
+    [Authorize]
+    //[Authorize (Roles = "Admin")]
     public class AuthorizationController : AppControllerBase //{ControllerBase}  handle ObjectResult ReturnCode = StatusCode
     {
         #region Fields
@@ -32,6 +33,9 @@ namespace SchoolProject.Api.Controllers
 
         #region Handel Function
 
+        //[Authorize(Roles = "Admin")]  // Admin And User
+        //[Authorize(Roles = "User")]
+        [Authorize(Roles = "Admin,User")]  // Admin or User
         [HttpPost(Router.AuthorizationRoute.Create)]
         public async Task<IActionResult> AddRole([FromForm] AddRoleCommand Command)
         {

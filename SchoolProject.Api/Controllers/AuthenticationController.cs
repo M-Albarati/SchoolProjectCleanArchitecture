@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolProject.Api.Base;
 using SchoolProject.Core.Features.Authentication.Commands.Models;
@@ -9,6 +10,7 @@ using SchoolProject.Data.AppMetaData;
 namespace SchoolProject.Api.Controllers
 {
     [ApiController]
+    
     public class AuthenticationController : AppControllerBase //{ControllerBase}  handle ObjectResult ReturnCode = StatusCode
     {
         #region Fields
@@ -36,7 +38,7 @@ namespace SchoolProject.Api.Controllers
             var response = await Mediator.Send(Command);
             return NewResult(response);
         }
-
+        
         [HttpPost(Router.AuthRoute.RefreshToken)]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand Command)
         {

@@ -1,4 +1,6 @@
-﻿using Azure.Core;
+﻿using Azure;
+using Azure.Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -10,12 +12,14 @@ using SchoolProject.Service.Abstracts;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -28,15 +32,20 @@ namespace SchoolProject.Service.Implementations
         //private readonly ConcurrentDictionary<string, RefreshToken> _UserRefreshToken;
         private readonly IUserRefreshTokenRepository _userRefreshTokenRepository;
         private readonly UserManager<User> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         #endregion
 
         #region Constructor
-        public AuthenticationService(JwtSettings jwtSettings, IUserRefreshTokenRepository userRefreshTokenRepository, UserManager<User> userManager)
+        public AuthenticationService(JwtSettings jwtSettings,
+                                     IUserRefreshTokenRepository userRefreshTokenRepository,
+                                     UserManager<User> userManager,
+                                     IHttpContextAccessor httpContextAccessor)
         {
             _jwtSettings = jwtSettings;
             //_UserRefreshToken = new ConcurrentDictionary<string, RefreshToken>();
             _userRefreshTokenRepository = userRefreshTokenRepository;
             _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
         }
         #endregion
 
@@ -44,7 +53,7 @@ namespace SchoolProject.Service.Implementations
         public  async Task<JwtAuthResult> GetJWTToken(User user)
         {
             // Generate jwtToken, accessToken
-            var (jwtToken, accessToken) = GenerateJWTToken(user);
+            var (jwtToken, accessToken) = await GenerateJWTToken(user);
             // Generate RefreshToken
             var refreshToken = GetRefreshToken(user.UserName);
 
@@ -74,21 +83,26 @@ namespace SchoolProject.Service.Implementations
         }
 
          // Generate jwtToken, accessToken
-         private (JwtSecurityToken, string) GenerateJWTToken(User user)
+         private async Task<(JwtSecurityToken, string)> GenerateJWTToken(User user)
         {
             //string issuer = null, string audience = null, IEnumerable<Claim> claims = null
             //, DateTime? notBefore = null, DateTime? expires = null, SigningCredentials signingCredentials = null
-            var Claims = GetClaims(user);
+            var roles = await _userManager.GetRolesAsync(user);
+            var Claims = GetClaims(user,roles.ToList());
             var jwtToken = new JwtSecurityToken(
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Audience,
-                claims:Claims,
+                claims: Claims,
                 expires: DateTime.Now.AddDays(_jwtSettings.AccessTokenExpireDate),
                 signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.Secret)), SecurityAlgorithms.HmacSha256) //HmacSha256Signature
                                                 );
-            var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+            
+            var handler = new JwtSecurityTokenHandler();
+            var accessToken = handler.WriteToken(jwtToken);
+            var jwtToken2 = handler.ReadJwtToken(accessToken);
             return (jwtToken, accessToken);
         }
+        
         // Generate RefreshToken
         private RefreshToken GetRefreshToken(string username)
         {
@@ -112,7 +126,7 @@ namespace SchoolProject.Service.Implementations
         }
 
         // GetClaims
-        public List<Claim> GetClaims(User user)
+        public List<Claim> GetClaims(User user, List<string> roles)
         {
             var Claims = new List<Claim>()
             {
@@ -121,20 +135,28 @@ namespace SchoolProject.Service.Implementations
                 new Claim (nameof(UserClaimModel.Email),user.Email),
                 new Claim (nameof(UserClaimModel.PhoneNumber),user.PhoneNumber)
             };
+
+            //Add User Roles to  User claims
+            foreach (var role in roles)
+            {
+                Claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+            }
             return Claims;
         }
 
         public async Task<JwtAuthResult> GetRefreshToken(string accessToken, string refreshToken)
         {
             // ReadJWTToken
-            var jwtSecurityToken = ReadJWTToken(accessToken);
-
+            var jwtSecurityToken = await ReadJWTToken(accessToken);
+            
             // Validation
             if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256)) ////HmacSha256Signature
             {
                 throw new SecurityTokenException("Algorithm Is Wrong",null);
             }
-            if (jwtSecurityToken.ValidTo > DateTime.UtcNow)
+            
+            //if (jwtSecurityToken.ValidTo > DateTime.UtcNow)
+            if (jwtSecurityToken.ValidTo > DateTime.Now)
             {
                 throw new SecurityTokenException("Token Is  NotExpired", null);
             }
@@ -166,7 +188,7 @@ namespace SchoolProject.Service.Implementations
             }
 
             // Generate Access Token
-            var (jwtToken,NewAccess) = GenerateJWTToken(user);
+            var (jwtToken,NewAccess) = await GenerateJWTToken(user);
             var OldRefresh = new RefreshToken
             {
                 ExpirAt = userRefreshToken.ExpiryDate,
@@ -182,15 +204,14 @@ namespace SchoolProject.Service.Implementations
 
         }
 
-        public JwtSecurityToken ReadJWTToken(string accessToken)
+        public async Task<JwtSecurityToken> ReadJWTToken(string accessToken)
         {
             // AccessToken Is null
             if (string.IsNullOrEmpty(accessToken))
                 throw new ArgumentNullException(nameof(accessToken));
-
+          
             var handler = new JwtSecurityTokenHandler();
             var response = handler.ReadJwtToken(accessToken);
-
             return response;
         }
 
@@ -200,14 +221,16 @@ namespace SchoolProject.Service.Implementations
             var parameters = new TokenValidationParameters
             {
                 ValidateIssuer = _jwtSettings.ValidateIssuer,
-                ValidIssuers = new[] { _jwtSettings.Issuer },
+                ValidIssuer = _jwtSettings.Issuer ,
+                ValidIssuers = new []{ _jwtSettings.Issuer},
                 ValidateIssuerSigningKey = _jwtSettings.ValidateIssuerSigningKey,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.Secret)),
                 ValidAudience = _jwtSettings.Audience,
                 ValidateAudience = _jwtSettings.ValidateAudience,
+                ValidAudiences = new[] { _jwtSettings.Audience },
                 ValidateLifetime = _jwtSettings.ValidateLifeTime,
             };
-            var validator = handler.ValidateToken(accessToken, parameters, out SecurityToken validatedToken);
+            var validator =  handler.ValidateToken(accessToken, parameters, out SecurityToken validatedToken);
             try
             {
                 if (validatedToken == null)

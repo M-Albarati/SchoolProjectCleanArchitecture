@@ -10,6 +10,7 @@ using SchoolProject.Infrustructure.Data;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -53,20 +54,27 @@ namespace SchoolProject.Infrustructure
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                //x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
            .AddJwtBearer(x =>
            {
                x.RequireHttpsMetadata = false;
                x.SaveToken = true;
+               //x.MapInboundClaims = false;
                x.TokenValidationParameters = new TokenValidationParameters
                {
                    ValidateIssuer = jwtSettings.ValidateIssuer,
+                   //ValidIssuer = jwtSettings.Issuer ,
                    ValidIssuers = new[] { jwtSettings.Issuer },
+                   //ValidAlgorithms = new[] { "HmacSha256" },
                    ValidateIssuerSigningKey = jwtSettings.ValidateIssuerSigningKey,
                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
                    ValidAudience = jwtSettings.Audience,
                    ValidateAudience = jwtSettings.ValidateAudience,
                    ValidateLifetime = jwtSettings.ValidateLifeTime,
+
+                   //NameClaimType = "name", // Map a custom claim to User.Identity.Name
+                   //RoleClaimType = "role" // Map a custom claim to User.IsInRole()
                };
            });
 
