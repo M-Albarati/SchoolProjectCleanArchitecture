@@ -34,6 +34,20 @@ namespace SchoolProject.Service.Implementations
             return "Fiald";
         }
 
+        public async Task<string> EditRoleAsync(int Id, string Name)
+        {
+            // check role Exist
+            var role = await _roleManager.FindByIdAsync(Id.ToString());
+            if (role == null) return "Not Found";
+
+            role.Name= Name;
+            var result = await _roleManager.UpdateAsync(role);
+            if (result.Succeeded) return "Succes";
+            // Fiald
+            var errors = string.Join("-",result.Errors);
+            return errors;
+        }
+
         public async Task<bool> IsExistsAsync(string roleName)
         {
             return await _roleManager.RoleExistsAsync(roleName);

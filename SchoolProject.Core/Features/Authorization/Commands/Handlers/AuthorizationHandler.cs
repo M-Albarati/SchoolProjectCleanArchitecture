@@ -13,7 +13,8 @@ using System.Threading.Tasks;
 namespace SchoolProject.Core.Features.Authorization.Commands.Handlers
 {
     public class AuthorizationHandler: ResponseHandler,
-                                       IRequestHandler<AddRoleCommand,Response<string>>
+                                       IRequestHandler<AddRoleCommand,Response<string>>,
+                                       IRequestHandler<EditRoleCommand,Response<string>>
     {
         #region Fields
         private readonly IAuthorizationService _authorizationService;
@@ -29,9 +30,17 @@ namespace SchoolProject.Core.Features.Authorization.Commands.Handlers
         #region Handle Functions
         public async Task<Response<string>> Handle(AddRoleCommand request, CancellationToken cancellationToken)
         {
-            var role = await _authorizationService.AddRoleAsync(request.RoleName);
-            if (role == "Succes") return Success("");
-            return BadRequest<string>();
+            var result = await _authorizationService.AddRoleAsync(request.RoleName);
+            if (result == "Succes") return Added("");
+            return BadRequest<string>(); 
+        }
+
+        public async Task<Response<string>> Handle(EditRoleCommand request, CancellationToken cancellationToken)
+        {
+            var result = await _authorizationService.EditRoleAsync(request.Id, request.Name);
+            if (result == "Not Found") return NotFound<string>();
+            else if (result == "Succes") return Updated(""); 
+            else return BadRequest<string>(result);
         }
         #endregion
     }
