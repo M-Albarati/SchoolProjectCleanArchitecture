@@ -5,14 +5,16 @@ using SchoolProject.Api.Base;
 using SchoolProject.Core.Features.Authentication.Commands.Models;
 using SchoolProject.Core.Features.Authentication.Queries.Models;
 using SchoolProject.Core.Features.Authorization.Commands.Models;
+using SchoolProject.Core.Features.Authorization.Queries.Models;
 using SchoolProject.Data.AppMetaData;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SchoolProject.Api.Controllers
 {
     //[Route("api/[controller]")]
     [ApiController]
-    [Authorize]
-    //[Authorize (Roles = "Admin")]
+    //[Authorize]
+        //[Authorize (Roles = "Admin")]
     public class AuthorizationController : AppControllerBase //{ControllerBase}  handle ObjectResult ReturnCode = StatusCode
     {
         #region Fields
@@ -33,9 +35,9 @@ namespace SchoolProject.Api.Controllers
 
         #region Handel Function
 
-        //[Authorize(Roles = "Admin")]  // Admin And User
-        //[Authorize(Roles = "User")]
-        [Authorize(Roles = "Admin,User")]  // Admin or User
+            //[Authorize(Roles = "Admin")]  // Admin And User
+            //[Authorize(Roles = "User")]
+        //[Authorize(Roles = "Admin,User")]  // Admin or User
         [HttpPost(Router.AuthorizationRoute.Create)]
         public async Task<IActionResult> AddRole([FromForm] AddRoleCommand Command)
         {
@@ -49,6 +51,31 @@ namespace SchoolProject.Api.Controllers
         {
             //var response = await _mediator.Send(Command);
             var response = await Mediator.Send(Command);
+            return NewResult(response);
+        }
+
+        [HttpDelete(Router.AuthorizationRoute.Delete)]
+        public async Task<IActionResult> DeleteRole([FromRoute] int id)
+        {
+            //var response = await _mediator.Send(Command);
+            var response = await Mediator.Send(new DeleteRoleCommand(id));
+            return NewResult(response);
+        }
+
+        [HttpGet(Router.AuthorizationRoute.List)]
+        public async Task<IActionResult> GetRoleList()
+        {
+            //var response = await _mediator.Send(Command);
+            var response = await Mediator.Send(new GetRoleListQuery());
+            return NewResult(response);
+        }
+
+        [HttpGet(Router.AuthorizationRoute.GetById)]
+        public async Task<IActionResult> GetRoleById([FromRoute] int id)
+        {
+            //var response = await _mediator.Send(Command);
+            //var response = await Mediator.Send(new GetRoleByIdQuery(id)); // calss with ctor
+            var response = await Mediator.Send(new GetRoleByIdQuery() { Id = id}); // calss with out ctor
             return NewResult(response);
         }
         #endregion

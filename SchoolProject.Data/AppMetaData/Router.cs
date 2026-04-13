@@ -58,7 +58,9 @@ namespace SchoolProject.Data.AppMetaData
             private const string Prefix = Rule + "/" + "Authorization";
             public const string Create = Prefix + "/" + "Role/Create";
             public const string Update = Prefix + "/" + "Role/Update";
-            public const string Delete = Prefix + "/" + "Role/Delete";
+            public const string Delete = Prefix + "/" + "Role/Delete/{id}";
+            public const string List = Prefix + "/" + "Role/List";
+            public const string GetById = Prefix + "/" + "Role/{id}";
         }
     }
 }

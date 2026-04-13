@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SchoolProject.Data.Entities.Identity;
 using SchoolProject.Service.Abstracts;
 using System;
@@ -14,12 +15,15 @@ namespace SchoolProject.Service.Implementations
     {
         #region Fields
         private readonly RoleManager<Role> _roleManager;
+        private readonly UserManager<User> _userManager;
         #endregion
 
         #region Constractor
-        public AuthorizationService(RoleManager<Role> roleManager)
+        public AuthorizationService(RoleManager<Role> roleManager,
+                                    UserManager<User> userManager)
         {
             _roleManager = roleManager;
+            _userManager = userManager;
         }
         #endregion
 
@@ -28,10 +32,26 @@ namespace SchoolProject.Service.Implementations
         {
             var role = new Role();
             role.Name = roleName;
-           
+
             var result = await _roleManager.CreateAsync(role);
             if (result.Succeeded) return "Succes";
             return "Fiald";
+        }
+
+        public async Task<string> DeleteRoleAsync(int Id)
+        {
+            var role = await _roleManager.FindByIdAsync(Id.ToString());
+            if (role == null) return "Not Found";
+
+            // check users has this role
+            var users = await _userManager.GetUsersInRoleAsync(role.Name);
+            if (users != null && users.Count() > 0) return "Used";
+
+            var result = await _roleManager.DeleteAsync(role);
+            if (result.Succeeded) return "Succes";
+            // Fiald
+            var errors = string.Join("-", result.Errors);
+            return errors;
         }
 
         public async Task<string> EditRoleAsync(int Id, string Name)
@@ -40,18 +60,36 @@ namespace SchoolProject.Service.Implementations
             var role = await _roleManager.FindByIdAsync(Id.ToString());
             if (role == null) return "Not Found";
 
-            role.Name= Name;
+            role.Name = Name;
             var result = await _roleManager.UpdateAsync(role);
             if (result.Succeeded) return "Succes";
             // Fiald
-            var errors = string.Join("-",result.Errors);
+            var errors = string.Join("-", result.Errors);
             return errors;
         }
 
-        public async Task<bool> IsExistsAsync(string roleName)
+        public async Task<bool> IsExistByNameAsync(string roleName)
         {
             return await _roleManager.RoleExistsAsync(roleName);
+        }
+
+        public async Task<bool> IsExistByIdAsync(int Id)
+        {
+            var role = await _roleManager.FindByIdAsync(Id.ToString());
+            if (role == null) return false;
+            else return true;
+        }
+
+        public async Task<List<Role>> GetRoleListAsync()
+        {
+            return await _roleManager.Roles.ToListAsync();
+        }
+
+        public async Task<Role> GetRoleByIdAsync(int Id)
+        {
+            return await _roleManager.Roles.FirstOrDefaultAsync(x => x.Id.Equals(Id));
         }
         #endregion
     }
 }
+

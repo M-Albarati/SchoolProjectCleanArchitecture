@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace SchoolProject.Core.Features.Authorization.Commands.Validations
 {
-    public class AddRoleValidators:AbstractValidator<AddRoleCommand>
+    public class DeleteRoleValidators: AbstractValidator<DeleteRoleCommand>
     {
         #region Fields
         private readonly IAuthorizationService _authorizationService;
         #endregion
 
         #region Constractor
-        public AddRoleValidators(IAuthorizationService authorizationService)
+        public DeleteRoleValidators(IAuthorizationService authorizationService)
         {
             _authorizationService = authorizationService;
             ApplyValidationRoles();
@@ -28,15 +28,15 @@ namespace SchoolProject.Core.Features.Authorization.Commands.Validations
         #region Actions
         public void ApplyValidationRoles()
         {
-            RuleFor(x => x.RoleName)
+            RuleFor(x => x.Id)
                 .NotNull().WithMessage("Name Must Be Not Null")
                 .NotEmpty().WithMessage("Name Must Be Not Empty");
         }
 
         public void ApplyCustomValidationRoles()
         {
-            RuleFor(x => x.RoleName).MustAsync(async (key, CancellationToken) => !await _authorizationService.IsExistByNameAsync(key))
-                .WithMessage(" This Name Is Exist");
+            //RuleFor(x => x.Id).MustAsync(async (key, CancellationToken) => await _authorizationService.IsExistByIdAsync(key))
+            //    .WithMessage("Not Exist");
         }
         #endregion
     }
