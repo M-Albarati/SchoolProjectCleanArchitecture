@@ -78,6 +78,15 @@ namespace SchoolProject.Api.Controllers
             var response = await Mediator.Send(new GetRoleByIdQuery() { Id = id}); // calss with out ctor
             return NewResult(response);
         }
+
+        [HttpGet(Router.AuthorizationRoute.ManageUserRolesData)]
+        public async Task<IActionResult> ManageUserRolesData([FromRoute] int userid)
+        {
+            //var response = await _mediator.Send(Command);
+            //var response = await Mediator.Send(new ManageUserRolesDataQuery(userid)); // calss with ctor
+            var response = await Mediator.Send(new ManageUserRolesDataQuery() { UserId = userid }); // calss with out ctor
+            return NewResult(response);
+        }
         #endregion
     }
 }

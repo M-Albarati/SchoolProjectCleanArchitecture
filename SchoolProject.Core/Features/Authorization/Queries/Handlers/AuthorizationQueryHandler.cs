@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SchoolProject.Core.Bases;
 using SchoolProject.Core.Features.Authorization.Queries.Models;
 using SchoolProject.Core.Features.Authorization.Queries.Responses;
+using SchoolProject.Data.DTOs;
+using SchoolProject.Data.Entities.Identity;
 using SchoolProject.Service.Abstracts;
 using System;
 using System.Collections.Generic;
@@ -14,19 +18,23 @@ namespace SchoolProject.Core.Features.Authorization.Queries.Handlers
 {
     public class AuthorizationQueryHandler : ResponseHandler,
     IRequestHandler<GetRoleListQuery, Response<List<GetRoleListResponse>>>,
-    IRequestHandler<GetRoleByIdQuery, Response<GetRoleByIdResponse>>
+    IRequestHandler<GetRoleByIdQuery, Response<GetRoleByIdResponse>>,
+    IRequestHandler<ManageUserRolesDataQuery, Response<ManageUserRolesDataResponse>>
     {
         #region Fields
         private readonly IAuthorizationService _authorizationService;
         private readonly IMapper _mapper;
+        private readonly UserManager<User> _useranager;
         #endregion
 
         #region Constractor
         public AuthorizationQueryHandler(IAuthorizationService authorizationService,
-                                         IMapper mapper)
+                                         IMapper mapper,
+                                         UserManager<User> useranager)
         {
             _authorizationService = authorizationService;
             _mapper = mapper;
+            _useranager = useranager;
         }
         #endregion
 
@@ -47,7 +55,23 @@ namespace SchoolProject.Core.Features.Authorization.Queries.Handlers
             return Success(roleMapper);
         }
 
+        public async Task<Response<ManageUserRolesDataResponse>> Handle(ManageUserRolesDataQuery request, CancellationToken cancellationToken)
+        {
+            // check User is Exist
+            var User = await _useranager.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);
+            if (User == null)
+            {
+                return NotFound<ManageUserRolesDataResponse>("User Not Found");
+            };
+            // return List Of Roles with True on Exist User Roles
+            var result = await _authorizationService.ManageUserRolesData(request.UserId);
+            
+            return Success(result);
+           
+        }
+    }
+
         #endregion
 
-    }
+  
 }

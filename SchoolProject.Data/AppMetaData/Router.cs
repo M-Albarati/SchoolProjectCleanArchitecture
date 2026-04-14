@@ -61,6 +61,7 @@ namespace SchoolProject.Data.AppMetaData
             public const string Delete = Prefix + "/" + "Role/Delete/{id}";
             public const string List = Prefix + "/" + "Role/List";
             public const string GetById = Prefix + "/" + "Role/{id}";
+            public const string ManageUserRolesData = Prefix + "/" + "Role/ManageUserRolesData/{userid}";
         }
     }
 }

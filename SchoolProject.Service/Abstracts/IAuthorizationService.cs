@@ -1,4 +1,5 @@
-﻿using SchoolProject.Data.Entities.Identity;
+﻿using SchoolProject.Data.DTOs;
+using SchoolProject.Data.Entities.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,6 @@ namespace SchoolProject.Service.Abstracts
         Task<Role> GetRoleByIdAsync(int Id);
         Task<bool> IsExistByNameAsync(string roleName);
         Task<bool> IsExistByIdAsync(int Id);
+        Task<ManageUserRolesDataResponse> ManageUserRolesData(int UserId);
     }
 }

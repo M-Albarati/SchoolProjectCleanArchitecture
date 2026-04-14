@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SchoolProject.Data.DTOs;
 using SchoolProject.Data.Entities.Identity;
 using SchoolProject.Service.Abstracts;
 using System;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using static SchoolProject.Data.DTOs.ManageUserRolesDataResponse;
 
 namespace SchoolProject.Service.Implementations
 {
@@ -88,6 +90,28 @@ namespace SchoolProject.Service.Implementations
         public async Task<Role> GetRoleByIdAsync(int Id)
         {
             return await _roleManager.Roles.FirstOrDefaultAsync(x => x.Id.Equals(Id));
+        }
+
+        public async Task<ManageUserRolesDataResponse> ManageUserRolesData(int UserId)
+        {
+            var user =await _userManager.FindByIdAsync(UserId.ToString());
+            var roles = await _roleManager.Roles.ToListAsync();
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var response = new ManageUserRolesDataResponse();
+
+            var roleList = new List<Roles>();
+            foreach (var role in roles)
+            {
+                var userRole = new Roles();
+                userRole.Id = role.Id;
+                userRole.Name = role.Name;
+                userRole.HasRole = userRoles.Contains(role.Name.ToString());
+                roleList.Add(userRole);
+            }
+            response.UserId = user.Id;
+            response.RoleList = roleList;
+
+            return response;
         }
         #endregion
     }
