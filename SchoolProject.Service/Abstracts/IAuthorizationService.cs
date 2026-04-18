@@ -18,5 +18,6 @@ namespace SchoolProject.Service.Abstracts
         Task<bool> IsExistByNameAsync(string roleName);
         Task<bool> IsExistByIdAsync(int Id);
         Task<ManageUserRolesDataResponse> ManageUserRolesData(int UserId);
+        Task<string> UpdateUserRolesAsync(UpdateUserRolesRequest request);
     }
 }

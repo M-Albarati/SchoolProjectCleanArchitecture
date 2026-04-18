@@ -16,7 +16,8 @@ namespace SchoolProject.Core.Features.Authorization.Commands.Handlers
     public class AuthorizationCommandHandler : ResponseHandler,
                                        IRequestHandler<AddRoleCommand, Response<string>>,
                                        IRequestHandler<EditRoleCommand, Response<string>>,
-                                       IRequestHandler<DeleteRoleCommand, Response<string>>
+                                       IRequestHandler<DeleteRoleCommand, Response<string>>,
+                                       IRequestHandler<UpdateUserRolesCommand, Response<string>>
     {
         #region Fields
         private readonly IAuthorizationService _authorizationService;
@@ -36,7 +37,7 @@ namespace SchoolProject.Core.Features.Authorization.Commands.Handlers
         public async Task<Response<string>> Handle(AddRoleCommand request, CancellationToken cancellationToken)
         {
             var result = await _authorizationService.AddRoleAsync(request.RoleName);
-            if (result == "Succes") return Added("");
+            if (result == "Success") return Added("");
             return BadRequest<string>();
         }
 
@@ -44,7 +45,7 @@ namespace SchoolProject.Core.Features.Authorization.Commands.Handlers
         {
             var result = await _authorizationService.EditRoleAsync(request.Id, request.Name);
             if (result == "Not Found") return NotFound<string>();
-            else if (result == "Succes") return Updated("");
+            else if (result == "Success") return Updated("");
             else return BadRequest<string>(result);
         }
 
@@ -53,8 +54,21 @@ namespace SchoolProject.Core.Features.Authorization.Commands.Handlers
             var result = await _authorizationService.DeleteRoleAsync(request.Id);
             if (result == "Not Found") return NotFound<string>();
             else if (result == "Used") return BadRequest<string>("Role is Used");
-            else if (result == "Succes") return Deleted<string>();
+            else if (result == "Success") return Deleted<string>();
             else return BadRequest<string>(result);
+        }
+
+        public async Task<Response<string>> Handle(UpdateUserRolesCommand request, CancellationToken cancellationToken)
+        {
+            var result = await _authorizationService.UpdateUserRolesAsync(request);
+            switch (result)
+            {
+                case "User Not Found": return NotFound<string>("User Not Found");    
+                case "Faild Remove Old Roles": return BadRequest<string>("Faild Remove Old Roles");
+                case "Faild Add New Roles": return BadRequest<string>("Faild Add New Roles");
+                case "Faild Update User Roles": return BadRequest<string>("Faild Update User Roles");
+            }
+            return Updated<string>("");
         }
         #endregion
     }

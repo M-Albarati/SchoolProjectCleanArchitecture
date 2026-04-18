@@ -7,6 +7,7 @@ using SchoolProject.Core.Features.Authentication.Queries.Models;
 using SchoolProject.Core.Features.Authorization.Commands.Models;
 using SchoolProject.Core.Features.Authorization.Queries.Models;
 using SchoolProject.Data.AppMetaData;
+using Swashbuckle.AspNetCore.Annotations;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace SchoolProject.Api.Controllers
@@ -46,7 +47,7 @@ namespace SchoolProject.Api.Controllers
             return NewResult(response);
         }
 
-        [HttpPost(Router.AuthorizationRoute.Update)]
+        [HttpPut(Router.AuthorizationRoute.Update)]
         public async Task<IActionResult> EditRole([FromForm] EditRoleCommand Command)
         {
             //var response = await _mediator.Send(Command);
@@ -59,6 +60,15 @@ namespace SchoolProject.Api.Controllers
         {
             //var response = await _mediator.Send(Command);
             var response = await Mediator.Send(new DeleteRoleCommand(id));
+            return NewResult(response);
+        }
+
+        [SwaggerOperation(Summary = "تعديل صلاحيات المستخدمين", OperationId = "UpdateUserRoles")]
+        [HttpPut(Router.AuthorizationRoute.UpdateUserRoles)]
+        public async Task<IActionResult> UpdateUserRoles([FromBody] UpdateUserRolesCommand Command)
+        {
+            //var response = await _mediator.Send(Command);
+            var response = await Mediator.Send(Command);
             return NewResult(response);
         }
 
@@ -79,6 +89,7 @@ namespace SchoolProject.Api.Controllers
             return NewResult(response);
         }
 
+        [SwaggerOperation(Summary = "ادارة صلاحيات المستخدمين",OperationId = "ManageUserRolesData")]
         [HttpGet(Router.AuthorizationRoute.ManageUserRolesData)]
         public async Task<IActionResult> ManageUserRolesData([FromRoute] int userid)
         {

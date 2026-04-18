@@ -10,9 +10,9 @@ namespace SchoolProject.Data.DTOs
     public class ManageUserRolesDataResponse
     {
         public int UserId { get; set; }
-        public List<Roles> RoleList { get; set; }
+        public List<UserRole> RoleList { get; set; }
 
-        public class Roles
+        public class UserRole
         {
             public int Id { get; set; }
             public string Name { get; set; }

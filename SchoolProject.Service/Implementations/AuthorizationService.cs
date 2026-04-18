@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolProject.Data.DTOs;
 using SchoolProject.Data.Entities.Identity;
+using SchoolProject.Infrustructure.Data;
 using SchoolProject.Service.Abstracts;
 using System;
 using System.Collections.Generic;
@@ -18,14 +19,17 @@ namespace SchoolProject.Service.Implementations
         #region Fields
         private readonly RoleManager<Role> _roleManager;
         private readonly UserManager<User> _userManager;
+        private readonly AppDbContext _DbContext;
         #endregion
 
         #region Constractor
         public AuthorizationService(RoleManager<Role> roleManager,
-                                    UserManager<User> userManager)
+                                    UserManager<User> userManager,
+                                    AppDbContext DbContext)
         {
             _roleManager = roleManager;
             _userManager = userManager;
+            _DbContext = DbContext;
         }
         #endregion
 
@@ -36,7 +40,7 @@ namespace SchoolProject.Service.Implementations
             role.Name = roleName;
 
             var result = await _roleManager.CreateAsync(role);
-            if (result.Succeeded) return "Succes";
+            if (result.Succeeded) return "Success";
             return "Fiald";
         }
 
@@ -50,7 +54,7 @@ namespace SchoolProject.Service.Implementations
             if (users != null && users.Count() > 0) return "Used";
 
             var result = await _roleManager.DeleteAsync(role);
-            if (result.Succeeded) return "Succes";
+            if (result.Succeeded) return "Success";
             // Fiald
             var errors = string.Join("-", result.Errors);
             return errors;
@@ -64,7 +68,7 @@ namespace SchoolProject.Service.Implementations
 
             role.Name = Name;
             var result = await _roleManager.UpdateAsync(role);
-            if (result.Succeeded) return "Succes";
+            if (result.Succeeded) return "Success";
             // Fiald
             var errors = string.Join("-", result.Errors);
             return errors;
@@ -99,10 +103,10 @@ namespace SchoolProject.Service.Implementations
             var userRoles = await _userManager.GetRolesAsync(user);
             var response = new ManageUserRolesDataResponse();
 
-            var roleList = new List<Roles>();
+            var roleList = new List<UserRole>();
             foreach (var role in roles)
             {
-                var userRole = new Roles();
+                var userRole = new UserRole();
                 userRole.Id = role.Id;
                 userRole.Name = role.Name;
                 userRole.HasRole = userRoles.Contains(role.Name.ToString());
@@ -112,6 +116,34 @@ namespace SchoolProject.Service.Implementations
             response.RoleList = roleList;
 
             return response;
+        }
+
+        public async Task<string> UpdateUserRolesAsync(UpdateUserRolesRequest request)
+        {
+           var transact = await _DbContext.Database.BeginTransactionAsync();
+            try
+            {
+                // Check User
+                var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+                if (user == null) return "User Not Found";
+
+                //Remove Old User Roles
+                var userRoles = await _userManager.GetRolesAsync(user);
+                var Remresult = await _userManager.RemoveFromRolesAsync(user, userRoles);
+                if (!Remresult.Succeeded) return "Faild Remove Old Roles";
+
+                var Newroles = request.RoleList.Where(y => y.HasRole == true).Select(x => x.Name);
+                var Addresult = await _userManager.AddToRolesAsync(user, Newroles);
+                if (!Addresult.Succeeded) return "Faild Add New Roles";
+                await transact.CommitAsync();
+                return "Success";
+            }
+            catch (Exception)
+            {
+                await transact.RollbackAsync();
+                return "Faild Update User Roles";
+            }
+           
         }
         #endregion
     }
