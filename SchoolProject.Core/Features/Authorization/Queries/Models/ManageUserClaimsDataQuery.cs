@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SchoolProject.Core.Features.Authorization.Queries.Models
 {
-    public class ManageUserRolesDataQuery:IRequest<Response<ManageUserRolesDataResponse>>
+    public class ManageUserClaimsDataQuery:IRequest<Response<ManageUserClaimsDataResponse>>
     {
         public int UserId { get; set; }
     }

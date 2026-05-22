@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace SchoolProject.Core.Features.Authorization.Commands.Handlers
 {
-    public class AuthorizationCommandHandler : ResponseHandler,
+    public class RoleCommandHandler : ResponseHandler,
                                        IRequestHandler<AddRoleCommand, Response<string>>,
                                        IRequestHandler<EditRoleCommand, Response<string>>,
                                        IRequestHandler<DeleteRoleCommand, Response<string>>,
@@ -25,7 +25,7 @@ namespace SchoolProject.Core.Features.Authorization.Commands.Handlers
         #endregion
 
         #region Constractor
-        public AuthorizationCommandHandler(IAuthorizationService authorizationService,
+        public RoleCommandHandler(IAuthorizationService authorizationService,
                                            IMapper mapper)
         {
             _authorizationService = authorizationService;

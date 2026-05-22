@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SchoolProject.Data.Helpers
+namespace SchoolProject.Data.Results
 {
     public class JwtAuthResult
     {
@@ -17,5 +17,5 @@ namespace SchoolProject.Data.Helpers
         public string TokenString { get; set; }
         public DateTime ExpirAt { get; set; }
     }
-    
+
 }

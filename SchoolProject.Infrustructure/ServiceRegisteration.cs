@@ -110,6 +110,7 @@ namespace SchoolProject.Infrustructure
            });
             });
 
+            // Add Policy Authorization
             services.AddAuthorization(option =>
             {
                 option.AddPolicy("CreateStudent", policy =>

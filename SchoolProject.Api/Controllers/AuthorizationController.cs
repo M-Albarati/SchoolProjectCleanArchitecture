@@ -15,7 +15,7 @@ namespace SchoolProject.Api.Controllers
     //[Route("api/[controller]")]
     [ApiController]
     //[Authorize]
-        //[Authorize (Roles = "Admin")]
+    //[Authorize (Roles = "Admin")]
     public class AuthorizationController : AppControllerBase //{ControllerBase}  handle ObjectResult ReturnCode = StatusCode
     {
         #region Fields
@@ -36,8 +36,8 @@ namespace SchoolProject.Api.Controllers
 
         #region Handel Function
 
-            //[Authorize(Roles = "Admin")]  // Admin And User
-            //[Authorize(Roles = "User")]
+        //[Authorize(Roles = "Admin")]  // Admin And User
+        //[Authorize(Roles = "User")]
         //[Authorize(Roles = "Admin,User")]  // Admin or User
         [HttpPost(Router.AuthorizationRoute.Create)]
         public async Task<IActionResult> AddRole([FromForm] AddRoleCommand Command)
@@ -63,15 +63,6 @@ namespace SchoolProject.Api.Controllers
             return NewResult(response);
         }
 
-        [SwaggerOperation(Summary = "تعديل صلاحيات المستخدمين", OperationId = "UpdateUserRoles")]
-        [HttpPut(Router.AuthorizationRoute.UpdateUserRoles)]
-        public async Task<IActionResult> UpdateUserRoles([FromBody] UpdateUserRolesCommand Command)
-        {
-            //var response = await _mediator.Send(Command);
-            var response = await Mediator.Send(Command);
-            return NewResult(response);
-        }
-
         [HttpGet(Router.AuthorizationRoute.List)]
         public async Task<IActionResult> GetRoleList()
         {
@@ -85,17 +76,45 @@ namespace SchoolProject.Api.Controllers
         {
             //var response = await _mediator.Send(Command);
             //var response = await Mediator.Send(new GetRoleByIdQuery(id)); // calss with ctor
-            var response = await Mediator.Send(new GetRoleByIdQuery() { Id = id}); // calss with out ctor
+            var response = await Mediator.Send(new GetRoleByIdQuery() { Id = id }); // calss with out ctor
             return NewResult(response);
         }
 
-        [SwaggerOperation(Summary = "ادارة صلاحيات المستخدمين",OperationId = "ManageUserRolesData")]
+        [SwaggerOperation(Summary = "ادارة ادوار صلاحيات المستخدمين", OperationId = "ManageUserRolesData")]
         [HttpGet(Router.AuthorizationRoute.ManageUserRolesData)]
         public async Task<IActionResult> ManageUserRolesData([FromRoute] int userid)
         {
             //var response = await _mediator.Send(Command);
             //var response = await Mediator.Send(new ManageUserRolesDataQuery(userid)); // calss with ctor
             var response = await Mediator.Send(new ManageUserRolesDataQuery() { UserId = userid }); // calss with out ctor
+            return NewResult(response);
+        }
+
+        [SwaggerOperation(Summary = "تعديل ادوار صلاحيات المستخدمين", OperationId = "UpdateUserRoles")]
+        [HttpPut(Router.AuthorizationRoute.UpdateUserRoles)]
+        public async Task<IActionResult> UpdateUserRoles([FromBody] UpdateUserRolesCommand Command)
+        {
+            //var response = await _mediator.Send(Command);
+            var response = await Mediator.Send(Command);
+            return NewResult(response);
+        }
+
+        [SwaggerOperation(Summary = "ادارة صلاحيات المستخدمين", OperationId = "ManageUserClaimsData")]
+        [HttpGet(Router.AuthorizationRoute.ManageUserClaimsData)]
+        public async Task<IActionResult> ManageUserClaimsData([FromRoute] int userid)
+        {
+            //var response = await _mediator.Send(Command);
+            //var response = await Mediator.Send(new ManageUserRolesDataQuery(userid)); // calss with ctor
+            var response = await Mediator.Send(new ManageUserClaimsDataQuery() { UserId = userid }); // calss with out ctor
+            return NewResult(response);
+        }
+
+        [SwaggerOperation(Summary = "تعديل صلاحيات المستخدمين", OperationId = "UpdateUserClaims")]
+        [HttpPut(Router.AuthorizationRoute.UpdateUserClaims)]
+        public async Task<IActionResult> UpdateUserClaims([FromBody] UpdateUserClaimsCommand Command)
+        {
+            //var response = await _mediator.Send(Command);
+            var response = await Mediator.Send(Command);
             return NewResult(response);
         }
         #endregion
