@@ -63,6 +63,9 @@ namespace SchoolProject.Data.AppMetaData
             public const string GetById = Prefix + "/" + "Role/{id}";
             public const string ManageUserRolesData = Prefix + "/" + "Role/ManageUserRolesData/{userid}";
             public const string UpdateUserRoles = Prefix + "/" + "Role/UpdateUserRoles";
+            
+            public const string ManageUserClaimsData = Prefix + "/" + "Claims/ManageUserClaimsData/{userid}";
+            public const string UpdateUserClaims = Prefix + "/" + "Claims/UpdateUserClaims";
         }
     }
 }

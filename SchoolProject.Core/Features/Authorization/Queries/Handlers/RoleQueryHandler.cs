@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using SchoolProject.Core.Bases;
 using SchoolProject.Core.Features.Authorization.Queries.Models;
 using SchoolProject.Core.Features.Authorization.Queries.Responses;
-using SchoolProject.Data.DTOs;
 using SchoolProject.Data.Entities.Identity;
+using SchoolProject.Data.Results;
 using SchoolProject.Service.Abstracts;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace SchoolProject.Core.Features.Authorization.Queries.Handlers
 {
-    public class AuthorizationQueryHandler : ResponseHandler,
+    public class RoleQueryHandler : ResponseHandler,
     IRequestHandler<GetRoleListQuery, Response<List<GetRoleListResponse>>>,
     IRequestHandler<GetRoleByIdQuery, Response<GetRoleByIdResponse>>,
     IRequestHandler<ManageUserRolesDataQuery, Response<ManageUserRolesDataResponse>>
@@ -24,17 +24,17 @@ namespace SchoolProject.Core.Features.Authorization.Queries.Handlers
         #region Fields
         private readonly IAuthorizationService _authorizationService;
         private readonly IMapper _mapper;
-        private readonly UserManager<User> _useranager;
+        private readonly UserManager<User> _usermanager;
         #endregion
 
         #region Constractor
-        public AuthorizationQueryHandler(IAuthorizationService authorizationService,
+        public RoleQueryHandler(IAuthorizationService authorizationService,
                                          IMapper mapper,
-                                         UserManager<User> useranager)
+                                         UserManager<User> usermanager)
         {
             _authorizationService = authorizationService;
             _mapper = mapper;
-            _useranager = useranager;
+            _usermanager = usermanager;
         }
         #endregion
 
@@ -58,7 +58,7 @@ namespace SchoolProject.Core.Features.Authorization.Queries.Handlers
         public async Task<Response<ManageUserRolesDataResponse>> Handle(ManageUserRolesDataQuery request, CancellationToken cancellationToken)
         {
             // check User is Exist
-            var User = await _useranager.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);
+            var User = await _usermanager.Users.FirstOrDefaultAsync(x => x.Id == request.UserId);
             if (User == null)
             {
                 return NotFound<ManageUserRolesDataResponse>("User Not Found");

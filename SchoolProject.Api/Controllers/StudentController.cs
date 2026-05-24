@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolProject.Api.Base;
@@ -12,6 +13,7 @@ using System.Net;
 namespace SchoolProject.Api.Controllers
 {
     //[Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     public class StudentController : AppControllerBase //{ControllerBase}  handle ObjectResult ReturnCode = StatusCode
     {
@@ -56,6 +58,7 @@ namespace SchoolProject.Api.Controllers
             return NewResult(response);
 
         }
+        [Authorize(Policy = "CreateStudent")]
         [HttpPost(Router.StudentRoute.Create)]
         public async Task<IActionResult> Create ([FromBody] AddStudentCommand Command)
         {
@@ -64,6 +67,7 @@ namespace SchoolProject.Api.Controllers
            return NewResult(response);
 
         }
+        [Authorize(Policy = "EditStudent")]
         [HttpPut(Router.StudentRoute.Update)]
         public async Task<IActionResult> Update([FromBody] EditStudentCommand Command)
         {
@@ -72,7 +76,7 @@ namespace SchoolProject.Api.Controllers
             return NewResult(response);
 
         }
-
+        [Authorize(Policy = "DeleteStudent")]
         [HttpPost(Router.StudentRoute.Delete)]
         public async Task<IActionResult> Delete([FromBody] DeleteStudentCommand Command)
         {

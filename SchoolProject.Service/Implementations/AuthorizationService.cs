@@ -2,6 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolProject.Data.DTOs;
 using SchoolProject.Data.Entities.Identity;
+using SchoolProject.Data.Helpers;
+using SchoolProject.Data.Requests;
+using SchoolProject.Data.Results;
 using SchoolProject.Infrustructure.Data;
 using SchoolProject.Service.Abstracts;
 using System;
@@ -10,7 +13,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using static SchoolProject.Data.DTOs.ManageUserRolesDataResponse;
+using static SchoolProject.Data.Results.ManageUserClaimsDataResponse;
+using static SchoolProject.Data.Results.ManageUserRolesDataResponse;
 
 namespace SchoolProject.Service.Implementations
 {
@@ -100,7 +104,7 @@ namespace SchoolProject.Service.Implementations
         {
             var user =await _userManager.FindByIdAsync(UserId.ToString());
             var roles = await _roleManager.Roles.ToListAsync();
-            var userRoles = await _userManager.GetRolesAsync(user);
+            
             var response = new ManageUserRolesDataResponse();
 
             var roleList = new List<UserRole>();
@@ -109,7 +113,7 @@ namespace SchoolProject.Service.Implementations
                 var userRole = new UserRole();
                 userRole.Id = role.Id;
                 userRole.Name = role.Name;
-                userRole.HasRole = userRoles.Contains(role.Name.ToString());
+                userRole.HasRole = await _userManager.IsInRoleAsync(user,role.Name);
                 roleList.Add(userRole);
             }
             response.UserId = user.Id;
@@ -144,6 +148,62 @@ namespace SchoolProject.Service.Implementations
                 return "Faild Update User Roles";
             }
            
+        }
+
+        public async Task<ManageUserClaimsDataResponse> ManageUserClaimsData(int UserId)
+        {
+            var user = await _userManager.FindByIdAsync(UserId.ToString());
+            var claims =  ClaimsStore.claims.ToList();
+            var userClaims =await _userManager.GetClaimsAsync(user);
+            
+            var response = new ManageUserClaimsDataResponse();
+
+            var claimList = new List<UserClaim>();
+            foreach (var claim in claims)
+            {
+                var userClaim = new UserClaim();
+                userClaim.Type = claim.Type;
+                if (userClaims.Any(x => x.Type == claim.Type))
+                {
+                    userClaim.Value = true;
+                }
+                else
+                {
+                    userClaim.Value = false;
+                }
+                claimList.Add(userClaim);
+            }
+            response.UserId = user.Id;
+            response.ClaimList = claimList;
+
+            return response;
+        }
+
+        public async Task<string> UpdateUserClaimsAsync(UpdateUserClaimsRequest request)
+        {
+            var transact = await _DbContext.Database.BeginTransactionAsync();
+            try
+            {
+                // Check User
+                var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+                if (user == null) return "User Not Found";
+
+                //Remove Old User Claims
+                var userClaims = await _userManager.GetClaimsAsync(user);
+                var Remresult = await _userManager.RemoveClaimsAsync(user, userClaims);
+                if (!Remresult.Succeeded) return "Faild Remove Old Claims";
+
+                var Newclaims = request.ClaimList.Where(y => y.Value == true).Select(x => new Claim(x.Type , x.Value.ToString()) ) ;
+                var Addresult = await _userManager.AddClaimsAsync(user, Newclaims);
+                if (!Addresult.Succeeded) return "Faild Add New Claims";
+                await transact.CommitAsync();
+                return "Success";
+            }
+            catch (Exception)
+            {
+                await transact.RollbackAsync();
+                return "Faild Update User Claims";
+            }
         }
         #endregion
     }

@@ -1,0 +1,21 @@
+{
+  "fullName": "Mohammed Albarati",
+  "userName": "Admin123",
+  "email": "Admin@Admin.com",
+  "address": "Sanaa",
+  "country": "Yemen",
+  "phoneNumber": "777115122",
+  "password": "Admin123",
+  "confirmPassword": "Admin123"
+}
+
+{
+  "fullName": "Ahmed",
+  "userName": "Ahmed",
+  "email": ""Ahmed@Admin.com",
+  "address": "Taiz",
+  "country": "Yemen",
+  "phoneNumber": "123456789",
+  "password": "Ahmed123",
+  "confirmPassword": "Ahmed123"
+}
