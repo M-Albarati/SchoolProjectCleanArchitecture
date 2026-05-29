@@ -25,7 +25,7 @@ namespace SchoolProject.Core.Features.Authorization.Commands.Validations
         }
         #endregion
 
-        #region Actions
+        #region Handle Actions
         public void ApplyValidationRoles()
         {
             RuleFor(x => x.RoleName)

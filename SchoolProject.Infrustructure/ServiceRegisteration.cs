@@ -127,7 +127,10 @@ namespace SchoolProject.Infrustructure
                 });
             });
 
-
+            //Email Settings
+            var emailSettings = new EmailSettings();
+            configuration.GetSection(nameof(emailSettings)).Bind(emailSettings);
+            services.AddSingleton(emailSettings);
 
             return services;
         }

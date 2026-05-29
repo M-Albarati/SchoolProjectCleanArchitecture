@@ -10,7 +10,7 @@ namespace SchoolProject.Data.AppMetaData
     {
         private const string Root = "Api";
         private const string Version = "V1";
-        private const string Rule = Root+ "/" + Version;
+        private const string Rule = Root + "/" + Version;
 
         public static class StudentRoute
         {
@@ -63,9 +63,15 @@ namespace SchoolProject.Data.AppMetaData
             public const string GetById = Prefix + "/" + "Role/{id}";
             public const string ManageUserRolesData = Prefix + "/" + "Role/ManageUserRolesData/{userid}";
             public const string UpdateUserRoles = Prefix + "/" + "Role/UpdateUserRoles";
-            
+
             public const string ManageUserClaimsData = Prefix + "/" + "Claims/ManageUserClaimsData/{userid}";
             public const string UpdateUserClaims = Prefix + "/" + "Claims/UpdateUserClaims";
+        }
+
+        public static class EmailRoute
+        {
+            private const string Prefix = Rule + "/" + "Email";
+            public const string SendEmail = Prefix + "/" + "SendEmail";
         }
     }
 }
