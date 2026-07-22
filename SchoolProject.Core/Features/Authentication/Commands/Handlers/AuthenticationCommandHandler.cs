@@ -50,6 +50,11 @@ namespace SchoolProject.Core.Features.Authentication.Commands.Handlers
 
             // Try Login And Ckeck Password Is Correct
             var SignInResult = _signinmanager.CheckPasswordSignInAsync(user,request.Password,false);
+            
+            // check Email Confirmed
+            if(!user.EmailConfirmed)
+                return BadRequest<JwtAuthResult>("Email not Confirmed");
+            
             //Failed Return Password Not Correct
             if (!SignInResult.Result.Succeeded)
             {

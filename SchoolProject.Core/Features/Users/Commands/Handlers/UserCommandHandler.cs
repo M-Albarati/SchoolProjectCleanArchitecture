@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SchoolProject.Core.Bases;
 using SchoolProject.Core.Features.Users.Commands.Models;
 using SchoolProject.Data.Entities.Identity;
+using SchoolProject.Service.Abstracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,44 +23,43 @@ namespace SchoolProject.Core.Features.Users.Commands.Handlers
         #region Fields
         private readonly UserManager<User> _usermanager;
         private readonly IMapper _mapper;
+        private readonly IApplicationUserService _applicationUserService;
         #endregion
 
         #region Constractor
-        public UserCommandHandler(UserManager<User> usermanager, IMapper mapper)
+        public UserCommandHandler(UserManager<User> usermanager,
+                                 IMapper mapper,
+                                 IApplicationUserService applicationUserService)
         {
             _usermanager = usermanager;
             _mapper = mapper;
+            _applicationUserService = applicationUserService;
         }
         #endregion
 
         #region Handle Functions
         public async Task<Response<string>> Handle(AddUserCommand request, CancellationToken cancellationToken)
         {
-            // check UserName is Exist
-            var userByUserName = await _usermanager.FindByNameAsync(request.UserName);
-            if (userByUserName != null)
-            {
-                return BadRequest<string>("UserName Is Exist");
-            }
-            // check Email is Exist
-            var userByEmai = await _usermanager.FindByEmailAsync(request.Email);
-            if (userByEmai != null)
-            {
-                return BadRequest<string>("Email Is Exist");
-            }
+            
             // Create User With Password
-            var usermapper = _mapper.Map<User>(request);
-            var result =await _usermanager.CreateAsync(usermapper, request.Password);
-            // Add new user to User Role
-            await _usermanager.AddToRoleAsync(usermapper, "User");
-            //Faild
-            if (!result.Succeeded)
-            {
+            var IdentityUser = _mapper.Map<User>(request);
+            var result = await _applicationUserService.AddUserAsync(IdentityUser, request.Password);
 
-                return BadRequest<string>(result.ToString());
+            switch (result)
+            {
+                //Faild
+                case "UserName Is Exist": return BadRequest<string>(result);
+                case "Email Is Exist": return BadRequest<string>(result);
+                case "Failed to Send Email Confirmation": return BadRequest<string>(result);
+                case "Failed To Create User": return BadRequest<string>(result);
+                
+                    //Sucess Created And Send Email Confirmation
+                case "Created": return Created("Created");
+                default: return BadRequest<string>(result);
             }
-            //Sucess
-                return Created("Created"); 
+            
+
+
         }
 
         public async Task<Response<string>> Handle(EditUserCommand request, CancellationToken cancellationToken)

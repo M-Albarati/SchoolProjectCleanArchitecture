@@ -83,8 +83,8 @@ namespace SchoolProject.Service.Implementations
             return (jwtAuthResult);
         }
 
-         // Generate jwtToken, accessToken
-         private async Task<(JwtSecurityToken, string)> GenerateJWTToken(User user)
+        // Generate jwtToken, accessToken
+        private async Task<(JwtSecurityToken, string)> GenerateJWTToken(User user)
         {
             //string issuer = null, string audience = null, IEnumerable<Claim> claims = null
             //, DateTime? notBefore = null, DateTime? expires = null, SigningCredentials signingCredentials = null
@@ -249,6 +249,18 @@ namespace SchoolProject.Service.Implementations
                 throw;
             }
         }
+
+        public async Task<string> ConfirmEmail(int? userId, string? code)
+        {
+            if (userId == null || code == null)
+                return ("Invalid Code Or UserId");
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            var confirmEmail = await _userManager.ConfirmEmailAsync(user, code);
+
+            if (!confirmEmail.Succeeded)
+                return ("Unconfirmed Email");
+            else return ("Confirmed Email");
+    }
         #endregion
     }
 }

@@ -15,7 +15,8 @@ using System.Threading.Tasks;
 namespace SchoolProject.Core.Features.Authentication.Queries.Handlers
 {
     public class AuthenticationQueryHandler : ResponseHandler,
-                                              IRequestHandler<ValidateTokenQuery, Response<string>>
+                                              IRequestHandler<ValidateTokenQuery, Response<string>>,
+                                              IRequestHandler<ConfirmEmailQuery, Response<string>>
     {
 
         #region Fields
@@ -36,6 +37,18 @@ namespace SchoolProject.Core.Features.Authentication.Queries.Handlers
         {
             var result = await _authenticationService.ValidateToken(request.AccessToken);
             return Success(result);
+        }
+
+        public async Task<Response<string>> Handle(ConfirmEmailQuery request, CancellationToken cancellationToken)
+        {
+            var result = await _authenticationService.ConfirmEmail(request.UserId, request.Code);
+            switch (result)
+            {
+                case "Invalid Code Or UserId": return BadRequest<string>(result);
+                case "Unconfirmed Email": return BadRequest<string>(result);
+                case "Confirmed Email": return Success<string>(result);
+                default: return BadRequest<string>(result);
+            }
         }
         #endregion
     }
